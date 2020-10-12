@@ -1,0 +1,162 @@
+import discord
+from discord.ext import commands
+
+Token = "INSERT TOKEN HERE"
+
+client = commands.Bot(command_prefix="!")
+client.remove_command("help")
+
+# If True chief can mute everyone, if false not
+global status
+
+# The person that will control everyone voice state
+global chief
+
+
+# Prints a message when bot is ready
+@client.event
+async def on_ready():
+    global chief
+    global status
+
+    chief = ""
+    status = False
+
+    print("Bot is ready")
+
+
+# Help command, use - help
+@client.command()
+async def help(ctx):
+    embed = discord.Embed(
+        color=discord.Colour.dark_blue()
+    )
+    embed.set_author(name="**Commands**")
+    embed.add_field(name="**!help**", value="To get the list of all commands", inline=False)
+    embed.add_field(name="**!ping**", value="to get the latency of the bot", inline=False)
+    embed.add_field(name="**!mute**", value="to mute everyone in your voice channel", inline=False)
+
+    embed.add_field(name="**!unmute**", value="to mute everyone in your voice channel", inline=False)
+
+    embed.add_field(name="**!status  (on or off)**",
+                    value="to enable or disable the ability of the bot to mute or unmuted everyone "
+                          "in the voice channel depending of the status of the voice of a person", inline=False)
+    embed.add_field(name="**!chief**", value="to let the bot know who now is the person that is in charge of the voice "
+                                             "of everyone, if this person is you, if you mute yourself everyone in the voice channel will also "
+                                             "be muted, and the same for if you unmute yourself", inline=False)
+
+    embed.add_field(name="Open Source Bot, Come Collab", value="https://github.com/Druel02/Discord-Bot-for-Among-Us", inline=False)
+
+    embed.set_footer(text="Made by Druel02\n"
+                          "Collaborations: None yet :(")
+
+    await ctx.send(embed=embed)
+
+
+# Returns the latency in ms, command = !ping
+@client.command()
+async def ping(ctx):
+    await ctx.send(f"{round(client.latency * 1000)}ms")
+
+
+# Command that let users enable and disable the option of someone muting and unmuting everyone command = !status (on
+# of off)
+@client.command()
+async def status(ctx, *, statusEntered):
+    global status
+    global chief
+    if statusEntered.upper() == "ON":
+        status = True
+    else:
+        status = False
+
+    if not status:
+        await ctx.send("The option of 1 person muting it self and muting everyone else is disabled")
+    elif status and chief == "":
+        await ctx.send("The option of 1 person muting it self and muting everyone else is enabled, but there is no "
+                       "one that can do this, please use the command \n "
+                       "! chief (name#0000) to define the person with the control to mute everyone.")
+    elif status and chief != "":
+        await ctx.send(
+            f"The option of 1 person muting it self and muting everyone else is enabled, and the person with this "
+            f"power is {chief}")
+    else:
+        await ctx.send("Something went wrong! Can you please try again?")
+
+
+# Command that defines who will be able to mute himself and mute everyone else, the same for unmuting command =
+# !chief (name#0000)
+@client.command()
+async def chief(ctx, *, chiefEntered):
+    global chief
+    global status
+
+    if chiefEntered.upper() == "ME":
+        chief = ctx.message.author
+        if status:
+            await ctx.send(f"If {chief} mute himself everyone in his voice channel will also be muted!")
+        elif not status:
+            await ctx.send(
+                f"If you want {chief} to be able to mute everyone in his voice channel, please use the command ! "
+                f"status on ")
+        else:
+            await ctx.send("Something went wrong! Can you please try again?")
+
+    else:
+        if chiefEntered.find("#") == -1:
+            await ctx.send("Please insert the name in the following format: name#0000\n"
+                           "after the name you must put the number that you can find after the name in the user profile")
+        elif status:
+            chief = chiefEntered
+            await ctx.send(f"If {chief} mute himself everyone in his voice channel will also be muted!")
+        elif not status:
+            chief = chiefEntered
+            await ctx.send(
+                f"If you want {chief} to be able to mute everyone in his voice channel, please use the command ! "
+                f"status on ")
+        else:
+            await ctx.send("Something went wrong! Can you please try again?")
+
+
+# Mutes everyone in voice channel
+@client.command()
+async def mute(ctx):
+    voice_channel = ctx.author.voice.channel
+    for member in voice_channel.members:
+        print(member)
+        await member.edit(mute=True)
+
+
+# Unmutes everyone in voice channel
+@client.command()
+async def unmute(ctx):
+    voice_channel = ctx.author.voice.channel
+    for member in voice_channel.members:
+        await member.edit(mute=False)
+
+
+# Mutes and unmutes everyone depeding in the voice state of the Chief, if the status in on
+# When chief is muted every bot can "speak", when chief is unmuted every bot is muted
+@client.event
+async def on_voice_state_update(member, before, after):
+    global status
+    if str(member) == str(chief) and status == True:
+        if not before.self_mute and after.self_mute:
+            channel = member.voice.channel
+            for member in channel.members:
+                if not member.bot:
+                    await member.edit(mute=True)
+                else:
+                    await member.edit(mute=False)
+
+        elif before.self_mute and not after.self_mute:
+            channel = member.voice.channel
+            for member in channel.members:
+                if member.bot:
+                    await member.edit(mute=True)
+                else:
+                    await member.edit(mute=False)
+
+
+# Runs the bot with the token given
+client.run(Token)

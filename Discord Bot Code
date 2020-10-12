@@ -48,7 +48,7 @@ async def help(ctx):
     embed.add_field(name="Open Source Bot, Come Collab", value="https://github.com/Druel02/Discord-Bot-for-Among-Us", inline=False)
 
     embed.set_footer(text="Made by Druel02\n"
-                          "Collaborations: BrilLitrao\n")
+                          "Collaborations: BrilLitrao")
 
     await ctx.send(embed=embed)
 

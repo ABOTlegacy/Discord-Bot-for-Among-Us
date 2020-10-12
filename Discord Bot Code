@@ -33,22 +33,22 @@ async def help(ctx):
     )
     embed.set_author(name="**Commands**")
     embed.add_field(name="**!help**", value="To get the list of all commands", inline=False)
-    embed.add_field(name="**!ping**", value="to get the latency of the bot", inline=False)
-    embed.add_field(name="**!mute**", value="to mute everyone in your voice channel", inline=False)
+    embed.add_field(name="**!ping**", value="To get the latency of the bot", inline=False)
+    embed.add_field(name="**!mute**", value="To mute everyone in your voice channel", inline=False)
 
-    embed.add_field(name="**!unmute**", value="to mute everyone in your voice channel", inline=False)
+    embed.add_field(name="**!unmute**", value="To mute everyone in your voice channel", inline=False)
 
     embed.add_field(name="**!status  (on or off)**",
-                    value="to enable or disable the ability of the bot to mute or unmuted everyone "
+                    value="To enable or disable the ability of the bot to mute or unmuted everyone "
                           "in the voice channel depending of the status of the voice of a person", inline=False)
-    embed.add_field(name="**!chief**", value="to let the bot know who now is the person that is in charge of the voice "
+    embed.add_field(name="**!chief**", value="To let the bot know who now is the person that is in charge of the voice "
                                              "of everyone, if this person is you, if you mute yourself everyone in the voice channel will also "
                                              "be muted, and the same for if you unmute yourself", inline=False)
 
     embed.add_field(name="Open Source Bot, Come Collab", value="https://github.com/Druel02/Discord-Bot-for-Among-Us", inline=False)
 
     embed.set_footer(text="Made by Druel02\n"
-                          "Collaborations: None yet :(")
+                          "Collaborations: BrilLitrao\n")
 
     await ctx.send(embed=embed)
 
